@@ -25,7 +25,7 @@ pub async fn get_api_keys(
 
 pub async fn get_api_key(
     state: &Arc<AppState>,
-    api_key_id: u32,
+    api_key_id: i32,
 ) -> Option<ApiKey> {
     let query = format!("
         SELECT {}
@@ -44,7 +44,7 @@ pub async fn get_api_key(
 
 pub async fn get_deleted_api_key(
     state: &Arc<AppState>,
-    api_key_id: u32,
+    api_key_id: i32,
 ) -> Option<ApiKey> {
     let query = format!("
         SELECT {}
@@ -82,7 +82,7 @@ pub async fn create_api_key(
 
 pub async fn update_api_key(
     state: &Arc<AppState>,
-    api_key_id: u32,
+    api_key_id: i32,
     name: Option<String>,
     api_key: Option<String>,
 ) -> () {
@@ -105,7 +105,7 @@ pub async fn update_api_key(
 
 pub async fn delete_api_key(
     state: &Arc<AppState>,
-    api_key_id: u32,
+    api_key_id: i32,
 ) -> () {
     let query = "
         UPDATE api_keys

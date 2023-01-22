@@ -13,7 +13,7 @@ pub async fn get_api_keys(
 
 pub async fn get_api_key(
     state: Arc<AppState>,
-    api_key_id: u32,
+    api_key_id: i32,
 ) -> Option<ApiKey> {
     let data = repositories::api_keys::get_api_key(&state, api_key_id).await;
     data
@@ -25,13 +25,13 @@ pub async fn create_api_key(
     api_key: String,
 ) -> ApiKey {
     let last_insert_id = repositories::api_keys::create_api_key(&state, name, api_key).await;
-    let data = repositories::api_keys::get_api_key(&state, last_insert_id as u32).await;
+    let data = repositories::api_keys::get_api_key(&state, last_insert_id as i32).await;
     data.unwrap()
 }
 
 pub async fn update_api_key(
     state: Arc<AppState>,
-    api_key_id: u32,
+    api_key_id: i32,
     name: Option<String>,
     api_key: Option<String>,
 ) -> Option<ApiKey> {
@@ -46,7 +46,7 @@ pub async fn update_api_key(
 
 pub async fn delete_api_key(
     state: Arc<AppState>,
-    api_key_id: u32,
+    api_key_id: i32,
 ) -> Option<ApiKey> {
     let data = repositories::api_keys::get_api_key(&state, api_key_id).await;
     if data.is_none() {
