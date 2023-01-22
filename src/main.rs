@@ -17,6 +17,8 @@ use axum::{
 };
 use dotenv::dotenv;
 
+// TODO: openapi support
+
 #[tokio::main]
 async fn main() {
     dotenv().ok();
@@ -37,11 +39,11 @@ async fn main() {
     let shared_state = Arc::new(state::AppState{pool: pool});
 
     let app = Router::new()
-        .route("/api_keys", get(controllers::api_keys::get_api_keys))
-        .route("/api_keys/:id", get(controllers::api_keys::get_api_key))
-        .route("/api_keys", post(controllers::api_keys::create_api_key))
-        .route("/api_keys/:id", patch(controllers::api_keys::update_api_key))
-        .route("/api_keys/:id", delete(controllers::api_keys::delete_api_key))
+        .route("/v1/api_keys", get(controllers::api_keys::get_api_keys))
+        .route("/v1/api_keys/:id", get(controllers::api_keys::get_api_key))
+        .route("/v1/api_keys", post(controllers::api_keys::create_api_key))
+        .route("/v1/api_keys/:id", patch(controllers::api_keys::update_api_key))
+        .route("/v1/api_keys/:id", delete(controllers::api_keys::delete_api_key))
         .with_state(shared_state);
 
     let addr = SocketAddr::from_str(
