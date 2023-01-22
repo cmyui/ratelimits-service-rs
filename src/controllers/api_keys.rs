@@ -4,6 +4,7 @@ use crate::usecases;
 
 use std::sync::Arc;
 use axum::{
+    http::StatusCode,
     Json,
     extract,
 };
@@ -18,9 +19,11 @@ pub async fn get_api_keys(
 pub async fn get_api_key(
     extract::State(state): extract::State<Arc<AppState>>,
     extract::Path(api_key_id): extract::Path<u32>,
-) -> Json<Option<ApiKey>> {
-    let data = usecases::api_keys::get_api_key(state, api_key_id).await;
-    Json(data)
+) -> Result<Json<ApiKey>, StatusCode> {
+    match usecases::api_keys::get_api_key(state, api_key_id).await {
+        Some(val) => Ok(Json(val)),
+        None => Err(StatusCode::NOT_FOUND),
+    }
 }
 
 pub async fn create_api_key(
@@ -35,15 +38,19 @@ pub async fn update_api_key(
     extract::State(state): extract::State<Arc<AppState>>,
     extract::Path(api_key_id): extract::Path<u32>,
     extract::Json(args): extract::Json<ApiKeyUpdate>,
-) -> Json<ApiKey> {
-    let data = usecases::api_keys::update_api_key(state, api_key_id, args.name, args.api_key).await;
-    Json(data)
+) -> Result<Json<ApiKey>, StatusCode> {
+    match usecases::api_keys::update_api_key(state, api_key_id, args.name, args.api_key).await {
+        Some(val) => Ok(Json(val)),
+        None => Err(StatusCode::NOT_FOUND),
+    }
 }
 
 pub async fn delete_api_key(
     extract::State(state): extract::State<Arc<AppState>>,
     extract::Path(api_key_id): extract::Path<u32>,
-) -> Json<ApiKey> {
-    let data = usecases::api_keys::delete_api_key(state, api_key_id).await;
-    Json(data)
+) -> Result<Json<ApiKey>, StatusCode> {
+    match usecases::api_keys::delete_api_key(state, api_key_id).await {
+        Some(val) => Ok(Json(val)),
+        None => Err(StatusCode::NOT_FOUND),
+    }
 }

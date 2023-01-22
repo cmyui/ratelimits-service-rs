@@ -24,7 +24,7 @@ pub async fn get_api_keys(
 
 
 pub async fn get_api_key(
-    state: Arc<AppState>,
+    state: &Arc<AppState>,
     api_key_id: u32,
 ) -> Option<ApiKey> {
     let query = format!("
@@ -42,11 +42,30 @@ pub async fn get_api_key(
     data
 }
 
+pub async fn get_deleted_api_key(
+    state: &Arc<AppState>,
+    api_key_id: u32,
+) -> Option<ApiKey> {
+    let query = format!("
+        SELECT {}
+          FROM api_keys
+         WHERE id = ?
+           AND status = 'deleted'
+    ", READ_PARAMS);
+
+    let data = sqlx::query_as(query.as_str())
+        .bind(api_key_id)
+        .fetch_one(&state.pool)
+        .await
+        .ok();
+    data
+}
+
 pub async fn create_api_key(
-    state: Arc<AppState>,
+    state: &Arc<AppState>,
     name: String,
     api_key: String,
-) -> ApiKey {
+) -> u64 {
     let query = "
         INSERT INTO api_keys (name, api_key)
              VALUES (?, ?)
@@ -58,32 +77,22 @@ pub async fn create_api_key(
         .execute(&state.pool)
         .await
         .unwrap();
-
-    let query = format!("
-        SELECT {}
-          FROM api_keys
-         WHERE id = ?
-    ", READ_PARAMS);
-    let data = sqlx::query_as(query.as_str())
-        .bind(insert_result.last_insert_id())
-        .fetch_one(&state.pool)
-        .await
-        .unwrap();
-    data
+    insert_result.last_insert_id()
 }
 
 pub async fn update_api_key(
-    state: Arc<AppState>,
+    state: &Arc<AppState>,
     api_key_id: u32,
     name: Option<String>,
     api_key: Option<String>,
-) -> ApiKey {
+) -> () {
     let query = "
         UPDATE api_keys
            SET name = COALESCE(?, name),
                api_key = COALESCE(?, api_key),
                updated_at = NOW()
          WHERE id = ?
+           AND status != 'deleted'
     ";
     sqlx::query(query)
         .bind(name)
@@ -92,46 +101,22 @@ pub async fn update_api_key(
         .execute(&state.pool)
         .await
         .unwrap();
-
-    let query = format!("
-        SELECT {}
-          FROM api_keys
-         WHERE id = ?
-        ", READ_PARAMS
-    );
-    let data = sqlx::query_as(query.as_str())
-        .bind(api_key_id)
-        .fetch_one(&state.pool)
-        .await
-        .unwrap();
-    data
 }
 
 pub async fn delete_api_key(
-    state: Arc<AppState>,
+    state: &Arc<AppState>,
     api_key_id: u32,
-) -> ApiKey {
+) -> () {
     let query = "
         UPDATE api_keys
            SET status = 'deleted',
                updated_at = NOW()
          WHERE id = ?
+           AND status != 'deleted'
     ";
     sqlx::query(query)
         .bind(api_key_id)
         .execute(&state.pool)
         .await
         .unwrap();
-
-    let query = format!("
-        SELECT {}
-          FROM api_keys
-         WHERE id = ?
-    ", READ_PARAMS);
-    let data = sqlx::query_as(query.as_str())
-        .bind(api_key_id)
-        .fetch_one(&state.pool)
-        .await
-        .unwrap();
-    data
 }
