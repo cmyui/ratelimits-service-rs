@@ -51,6 +51,11 @@ async fn main() {
         .route("/v1/ratelimits/:id", patch(controllers::ratelimits::update_ratelimit))
         .route("/v1/ratelimits/:id", delete(controllers::ratelimits::delete_ratelimit))
 
+        .route("/v1/requests", get(controllers::requests::get_requests))
+        .route("/v1/requests/:id", get(controllers::requests::get_request))
+        .route("/v1/requests", post(controllers::requests::create_request))
+        .route("/v1/requests/:id", delete(controllers::requests::delete_request))
+
         .with_state(shared_state);
 
     let addr = SocketAddr::from_str(

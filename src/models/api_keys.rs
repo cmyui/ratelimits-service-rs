@@ -4,7 +4,7 @@ use sqlx;
 use serde::{Serialize, Deserialize};
 
 
-#[derive(sqlx::FromRow, Serialize)]
+#[derive(Serialize, sqlx::FromRow)]
 pub struct ApiKey {
     pub id: i32,
     pub name: String,
