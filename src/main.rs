@@ -44,6 +44,13 @@ async fn main() {
         .route("/v1/api_keys", post(controllers::api_keys::create_api_key))
         .route("/v1/api_keys/:id", patch(controllers::api_keys::update_api_key))
         .route("/v1/api_keys/:id", delete(controllers::api_keys::delete_api_key))
+
+        .route("/v1/ratelimits", get(controllers::ratelimits::get_ratelimits))
+        .route("/v1/ratelimits/:id", get(controllers::ratelimits::get_ratelimit))
+        .route("/v1/ratelimits", post(controllers::ratelimits::create_ratelimit))
+        .route("/v1/ratelimits/:id", patch(controllers::ratelimits::update_ratelimit))
+        .route("/v1/ratelimits/:id", delete(controllers::ratelimits::delete_ratelimit))
+
         .with_state(shared_state);
 
     let addr = SocketAddr::from_str(
